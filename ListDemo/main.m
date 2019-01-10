@@ -23,7 +23,7 @@ void testObjctElements()
     Person *p1 = [[Person alloc] initWithAge:10 name:@"tom"];
     Person *p2  = [[Person alloc] initWithAge:15 name:@"yebo"];
     Person *p3  = [[Person alloc] initWithAge:16 name:@"iris"];
-    List *l = [[List alloc] init];
+    List<Person *> *l = [[List alloc] init];
     [l addObject:p1];
     [l addObject:p2];
     [l insertObject:p3 atIndex:0];
@@ -41,6 +41,24 @@ void testObjctElements()
     }
     
     [l makeObjectsPerform:@selector(runWithValue:) with:@100000];
+    
+    for (Person *p in l) {
+        NSLog(@"%@", p);
+    }
+    
+    
+    [l sortedListUsingComparator:^NSComparisonResult(Person *  _Nonnull obj1, Person *  _Nonnull obj2) {
+        if (obj1.age < obj2.age) {
+            return NSOrderedDescending;
+        }
+        return NSOrderedAscending;
+    }];
+    
+    NSLog(@"____________");
+    
+    [l enumerateObjectsUsingBlock:^(Person *  _Nonnull p, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSLog(@"Person.age=%d, Person.age=%@", p.age, p.name);
+    }];
 }
 
 void test()

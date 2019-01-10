@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 数组是一块连续的内存，每个元素只接收一个对象的地址，所谓修改数组中的每个元素只是修改数组中每个地址所保存的地址
 
-@interface List : NSObject
+@interface List<__covariant ObjectType> : NSObject <NSFastEnumeration>
 {
 @private
     void **_dataPtr;    // 数据区 存放数据的内存首地址
@@ -22,37 +22,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSUInteger count;
 @property (nonatomic, readonly) NSUInteger capacity;
-@property (nullable, nonatomic, readonly) id lastObject;
+@property (nullable, nonatomic, readonly) ObjectType firstObject;
+@property (nullable, nonatomic, readonly) ObjectType lastObject;
 @property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 // 初始化
 - (instancetype)init;
 - (instancetype)initWithCapacity:(NSUInteger)capacity;
-- (id)copyFromZone:(void *)z;
+- (ObjectType)copyFromZone:(void *)z;
 
 // 重置数组容量
 - (void)setAvailableCapacity:(NSUInteger)numSlots;
 
 // 按照索引操作list
-- (id)objectAtIndex:(NSUInteger)index;
-- (void)addObject:(id)anObject;
-- (void)addObjectIfAbsent:(id)anObject;
-- (void)insertObject:(id)anObject atIndex:(NSUInteger)index;
-- (id)removeObjectAtIndex:(NSUInteger)index;
-- (id)removeLastObject;
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)newObject;
+- (ObjectType)objectAtIndex:(NSUInteger)index;
+- (void)addObject:(ObjectType)anObject;
+- (void)addObjectIfAbsent:(ObjectType)anObject;
+- (void)insertObject:(ObjectType)anObject atIndex:(NSUInteger)index;
+- (ObjectType)removeObjectAtIndex:(NSUInteger)index;
+- (ObjectType)removeLastObject;
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(ObjectType)newObject;
 - (void)addObjectsFromList:(List *)otherList;
 
 // 按照元素操作list
-- (NSUInteger)indexOfObject:(id)anObject;
-- (id)removeObject:(id)anObject;
-- (void)replaceObject:(id)anObject withObject:(id)newObject;
+- (NSUInteger)indexOfObject:(ObjectType)anObject;
+- (id)removeObject:(ObjectType)anObject;
+- (void)replaceObject:(ObjectType)anObject withObject:(ObjectType)newObject;
 
 // 给所有元素发送消息
 - (void)makeObjectsPerform:(SEL)aSelector;
 - (void)makeObjectsPerform:(SEL)aSelector with:(id)anObject;
 
 - (void)enumerateObjectsUsingBlock:(void ( ^)(id obj, NSUInteger idx, BOOL *stop))block;
+
+- (void)sortedListUsingComparator:(NSComparator)cmptr;
 @end
 
 NS_ASSUME_NONNULL_END

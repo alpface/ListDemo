@@ -93,7 +93,14 @@
     if (!_count) {
         return nil;
     }
-    return (__bridge id _Nullable)(_dataPtr[_count - 1]);
+    return (__bridge id _Nullable)*(_dataPtr+(_count - 1));
+}
+
+- (id)firstObject {
+    if (!_count) {
+        return nil;
+    }
+    return (__bridge id _Nullable)(*_dataPtr);
 }
 
 - (void)setAvailableCapacity:(NSUInteger)numSlots {
@@ -282,6 +289,61 @@
         }
         index++;
         tempDataPtr++;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - NSFastEnumeration
+////////////////////////////////////////////////////////////////////////
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])stackbuf
+                                    count:(NSUInteger)stackbufLength
+{
+    NSUInteger count = 0;
+    unsigned long countOfItemsAlreadyEnumerated = state->state;
+    
+    
+    if(countOfItemsAlreadyEnumerated == 0)
+    {
+        state->mutationsPtr = &state->extra[0];
+    }
+    // 利用了参数中的缓冲数组
+    if(countOfItemsAlreadyEnumerated < _count)
+    {
+        state->itemsPtr = stackbuf;
+        while((countOfItemsAlreadyEnumerated < _count) && (count < stackbufLength))
+        {
+            stackbuf[count] = (__bridge id)(_dataPtr[countOfItemsAlreadyEnumerated]);
+            countOfItemsAlreadyEnumerated++;
+            
+            count++;
+        }
+    }
+    else
+    {
+        count = 0;
+    }
+    state->state = countOfItemsAlreadyEnumerated;
+    return count;
+}
+
+- (void)sortedListUsingComparator:(NSComparator)cmptr {
+
+    // 使用冒泡排序，在冒泡排序的过程中，关键字较小的记录好比水中的气泡逐趟向上漂浮，而关键字较大的记录好比石块往下沉，每一趟有一块“最大”的石头沉到水底。
+
+    for(NSUInteger i=0;i<_count-1;i++) {
+        for(NSUInteger j=_count-1;j>i;j--) {
+            id value1Ptr = (__bridge id)(*(_dataPtr + j));
+            id value2Ptr = (__bridge id)(*(_dataPtr + j - 1));
+            NSComparisonResult result = cmptr(value1Ptr, value2Ptr);
+            if(result == NSOrderedDescending)
+            {
+                void *temp=*(_dataPtr+j);
+                *(_dataPtr+j)= *(_dataPtr + j - 1);
+                *(_dataPtr+j-1)=temp;
+            }
+        }
     }
 }
 
