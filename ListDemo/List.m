@@ -79,8 +79,8 @@
     }
     void **this = _dataPtr;
     // 最后一个元素的地址
-    void **last = this + _count;
-    while (this < last) {
+    void **last = this + (_count - 1);
+    while (this <= last) {
         if (*this == (__bridge void *)(anObject)) {
             return this - _dataPtr;
         }
@@ -166,23 +166,24 @@
     if (index >= _count) {
         return nil;
     }
+    // 定义临时指针变量，让index以后的每个元素向前移动一位
     this = _dataPtr + index;
-    last = _dataPtr + _count;
+    last = _dataPtr + (_count - 1);
     next = this + 1;
     retval = *this;
     // 移除的元素 后面的所有元素向前移动一位
-    while (next < last) {
+    while (next <= last) {
         *this++ = *next++;
-        _count--;
     }
+    _count--;
     return (__bridge id _Nonnull)(retval);
 }
 
 - (id)removeObject:(id)anObject {
     void **this, **last;
     this = _dataPtr;
-    last = _dataPtr + _count;
-    while (this < last) {
+    last = _dataPtr + (_count - 1);
+    while (this <= last) {
         if (*this == (__bridge void *)(anObject)) {
             return [self removeObjectAtIndex:this - _dataPtr];
         }
@@ -208,8 +209,8 @@
     }
     void **this, **last;
     this = _dataPtr;
-    last = _dataPtr + _count;
-    while (this < last) {
+    last = _dataPtr + (_count - 1);
+    while (this <= last) {
         if (*this == (__bridge void *)(anObject)) {
             *this = (__bridge void *)(newObject);
             return;
@@ -236,9 +237,9 @@
     while (count--) {
         id objc_obj = (__bridge id)_dataPtr[count];
         IMP imp = [objc_obj methodForSelector:aSelector];
-        void (*func)(id, SEL) = (void *)imp;
+        void (*func)(id, SEL, id) = (void *)imp;
         if (func != NULL) {
-            func(objc_obj, aSelector);
+            func(objc_obj, aSelector, anObject);
         }
     }
 }
@@ -255,7 +256,7 @@
     }
 }
 
-- (void)addObjectsFromList:(NSArray<id> *)otherList {
+- (void)addObjectsFromList:(List *)otherList {
     if (otherList.count == 0) {
         return;
     }
@@ -272,7 +273,7 @@
     void **tempDataPtr = _dataPtr;
     int index = 0;
     BOOL stop = NO;
-    while (*tempDataPtr != NULL) {
+    while (index < _count) {
         if (stop == YES) {
             return;
         }

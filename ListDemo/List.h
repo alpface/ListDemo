@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// 数组是一块连续的内存，每个元素只接收一个对象的地址，所谓修改数组中的每个元素只是修改数组中每个地址所保存的地址
+
 @interface List : NSObject
 {
 @private
@@ -39,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)removeObjectAtIndex:(NSUInteger)index;
 - (id)removeLastObject;
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)newObject;
-- (void)addObjectsFromList:(NSArray<id> *)otherList;
+- (void)addObjectsFromList:(List *)otherList;
 
 // 按照元素操作list
 - (NSUInteger)indexOfObject:(id)anObject;
@@ -48,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 给所有元素发送消息
 - (void)makeObjectsPerform:(SEL)aSelector;
-- (void)makeObjectsPerform:(SEL)aSelector with:anObject;
+- (void)makeObjectsPerform:(SEL)aSelector with:(id)anObject;
 
 - (void)enumerateObjectsUsingBlock:(void ( ^)(id obj, NSUInteger idx, BOOL *stop))block;
 @end
