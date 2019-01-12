@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 数组是一块连续的内存，每个元素只接收一个对象的地址，所谓修改数组中的每个元素只是修改数组中每个地址所保存的地址
 
-@interface List<__covariant ObjectType> : NSObject <NSFastEnumeration>
+@interface List<__covariant ObjectType> : NSObject <NSCopying, NSMutableCopying, NSFastEnumeration, NSSecureCoding>
 {
 @private
     void **_dataPtr;    // 数据区 存放数据的内存首地址
@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 // 初始化
 - (instancetype)init;
 - (instancetype)initWithCapacity:(NSUInteger)capacity;
-- (ObjectType)copyFromZone:(void *)z;
 
 // 重置数组容量
 - (void)setAvailableCapacity:(NSUInteger)numSlots;
@@ -56,6 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enumerateObjectsUsingBlock:(void ( ^)(id obj, NSUInteger idx, BOOL *stop))block;
 
 - (void)sortedListUsingComparator:(NSComparator)cmptr;
+
+/// 重载[]操作符  operator []：相当于中括号下标访问格式（array[index]），返回指定索引元素。等效于 objectAtIndex。
+- (ObjectType)objectAtIndexedSubscript:(NSUInteger)idx;
 @end
 
 NS_ASSUME_NONNULL_END

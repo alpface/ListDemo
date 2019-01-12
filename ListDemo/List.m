@@ -42,14 +42,6 @@
     }
 }
 
-
-- (id)copyFromZone:(void *)z {
-    List *newList = [[[self class] alloc] initWithCapacity:_count];
-    newList->_count = _count;
-    bcopy((const char *)_dataPtr, (char *)newList->_dataPtr, kDataSize(_count));
-    return newList;
-}
-
 - (BOOL)isEqual:(id)object {
     List *other;
     if (![object isKindOfClass:[self class]]) {
@@ -67,10 +59,11 @@
 
 - (id)objectAtIndex:(NSUInteger)index {
     if (index >= _count) {
-        return nil;
+        NSString *reson = [NSString stringWithFormat:@"%s: index %ld beyond bounds [%d .. %ld]", __FUNCTION__, index, 0, _count-1];
+        @throw [NSException exceptionWithName:NSRangeException reason:reson userInfo:nil];
     }
     
-    return (__bridge id)(_dataPtr[index]);
+    return (__bridge id)*(_dataPtr+index);
 }
 
 - (NSUInteger)indexOfObject:(id)anObject {
@@ -346,5 +339,35 @@
         }
     }
 }
+
+- (id)objectAtIndexedSubscript:(NSUInteger)idx {
+    return [self objectAtIndex:idx];
+}
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - NSCopying
+////////////////////////////////////////////////////////////////////////
+
+- (id)copyWithZone:(NSZone *)zone {
+    return self;
+}
+////////////////////////////////////////////////////////////////////////
+#pragma mark - NSMutableCopying
+////////////////////////////////////////////////////////////////////////
+
+- (id)mutableCopyWithZone:(NSZone *)zone {
+    
+    List *newList = [[[self class] alloc] initWithCapacity:_count];
+    newList->_count = _count;
+    bcopy(((const char *)_dataPtr), (char *)newList->_dataPtr, kDataSize(_count));
+    return newList;
+}
+
+#pragma mark *** NSSecureCoding ***
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 
 @end

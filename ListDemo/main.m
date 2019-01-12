@@ -59,6 +59,9 @@ void testObjctElements()
     [l enumerateObjectsUsingBlock:^(Person *  _Nonnull p, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"Person.age=%d, Person.age=%@", p.age, p.name);
     }];
+    
+    Person *ppp = l[1];
+    NSLog(@"%@", ppp);
 }
 
 void test()
